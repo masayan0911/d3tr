@@ -1,0 +1,21 @@
+{
+  "name": "D3TR - 飛距離300yd増量管理",
+  "short_name": "D3TR",
+  "description": "体重・食事を記録し、ゴルフの飛距離300ydを目指す増量管理アプリ",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
