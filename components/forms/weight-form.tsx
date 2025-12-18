@@ -9,13 +9,17 @@ interface WeightFormProps {
   onSuccess?: () => void;
   initialDate?: string;
   initialWeight?: string;
+  editId?: string;
+  onCancel?: () => void;
 }
 
-export function WeightForm({ onSuccess, initialDate, initialWeight }: WeightFormProps) {
+export function WeightForm({ onSuccess, initialDate, initialWeight, editId, onCancel }: WeightFormProps) {
   const [date, setDate] = useState(initialDate || getToday());
   const [weight, setWeight] = useState(initialWeight || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const isEditMode = !!editId;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,16 +35,22 @@ export function WeightForm({ onSuccess, initialDate, initialWeight }: WeightForm
 
     try {
       const res = await fetch('/api/weight', {
-        method: 'POST',
+        method: isEditMode ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, weight: weightNum }),
+        body: JSON.stringify(
+          isEditMode
+            ? { id: editId, weight: weightNum }
+            : { date, weight: weightNum }
+        ),
       });
 
       if (!res.ok) {
         throw new Error('保存に失敗しました');
       }
 
-      setWeight('');
+      if (!isEditMode) {
+        setWeight('');
+      }
       onSuccess?.();
     } catch {
       setError('体重の保存に失敗しました');
@@ -61,6 +71,7 @@ export function WeightForm({ onSuccess, initialDate, initialWeight }: WeightForm
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
+          disabled={isEditMode}
         />
         <Input
           type="number"
@@ -72,9 +83,16 @@ export function WeightForm({ onSuccess, initialDate, initialWeight }: WeightForm
           required
         />
       </div>
-      <Button type="submit" className="w-full" loading={loading}>
-        記録する
-      </Button>
+      <div className={isEditMode ? 'flex gap-2' : ''}>
+        <Button type="submit" className="w-full" loading={loading}>
+          {isEditMode ? '更新する' : '記録する'}
+        </Button>
+        {isEditMode && onCancel && (
+          <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
+            キャンセル
+          </Button>
+        )}
+      </div>
     </form>
   );
 }
